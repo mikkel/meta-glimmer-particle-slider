@@ -1,0 +1,12 @@
+{
+  "particle_sliders": "../particle-sliders",
+  "snapshot": "/path/to/verified/snapshots/a4e59da52a7bc87ae7251dd5545c0dd437c44b68",
+  "output_dir": "outputs/distill",
+  "adapter": "outputs/train/teacher-raw-000008.safetensors",
+  "max_tokens": 256,
+  "calibration_rows": 128,
+  "calibration": [
+    [{"role": "user", "content": "Describe a quiet garden."}],
+    [{"role": "user", "content": "Describe a rainy afternoon."}]
+  ]
+}

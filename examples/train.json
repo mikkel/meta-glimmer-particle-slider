@@ -1,0 +1,21 @@
+{
+  "particle_sliders": "../particle-sliders",
+  "snapshot": "/path/to/verified/snapshots/a4e59da52a7bc87ae7251dd5545c0dd437c44b68",
+  "output_dir": "outputs/train",
+  "max_weight_bytes": 2147483648,
+  "max_tokens": 256,
+  "max_new_tokens": 128,
+  "seed": 7,
+  "horizon": 1600,
+  "updates": 8,
+  "checkpoint_every": 4,
+  "training": [
+    {"neutral": [{"role": "user", "content": "Describe a quiet garden."}], "positive": [{"role": "system", "content": "Use a cheerful tone."}, {"role": "user", "content": "Describe a quiet garden."}], "history": []},
+    {"neutral": [{"role": "user", "content": "Describe a rainy afternoon."}], "positive": [{"role": "system", "content": "Use a cheerful tone."}, {"role": "user", "content": "Describe a rainy afternoon."}], "history": []}
+  ],
+  "evaluation": [
+    {"neutral": [{"role": "user", "content": "Describe a woodland path."}], "positive": [{"role": "system", "content": "Use a cheerful tone."}, {"role": "user", "content": "Describe a woodland path."}], "history": []},
+    {"neutral": [{"role": "user", "content": "Describe a train journey."}], "positive": [{"role": "system", "content": "Use a cheerful tone."}, {"role": "user", "content": "Describe a train journey."}], "history": []}
+  ],
+  "generation_evaluation": [[{"role": "user", "content": "Describe a woodland path."}]]
+}

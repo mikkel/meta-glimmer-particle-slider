@@ -11,14 +11,21 @@ from .upstream import api
 TARGET = re.compile(r"model\.language_model\.layers\.(\d+)\.self_attn\.(q_proj|k_proj|v_proj|o_proj)")
 
 
-def projections(model):
+def projections(model, *, execution="cpu"):
     selected = {name: module for name, module in model.named_modules() if TARGET.fullmatch(name)}
     if not selected:
         raise ValueError("No Glimmer language attention projections found")
     layers = {}
     for name, module in selected.items():
-        if type(module) is not nn.Linear or module.weight.device.type != "cpu":
-            raise ValueError("This release qualifies unquantized CPU Linear hosts only")
+        if execution == "cpu":
+            accepted = type(module) is nn.Linear and module.weight.device.type == "cpu"
+        elif execution == "nf4":
+            from bitsandbytes.nn import Linear4bit
+            accepted = isinstance(module, Linear4bit) and module.weight.device == torch.device("cuda:0")
+        else:
+            raise ValueError("Unknown host execution capability")
+        if not accepted:
+            raise ValueError(f"Unsupported projection for {execution}: {name}")
         if hasattr(module, "_glimmer_slider"):
             raise ValueError("An adapter is already attached")
         index, part = TARGET.fullmatch(name).groups()
@@ -28,13 +35,13 @@ def projections(model):
     return selected
 
 
-def signature(model, identity):
+def signature(model, identity, *, execution="cpu"):
     if set(identity) != {"model_id", "revision"} or not all(isinstance(x, str) and x for x in identity.values()):
         raise ValueError("Explicit base model ID and immutable revision required")
     if not re.fullmatch(r"[0-9a-f]{40}", identity["revision"]):
         raise ValueError("Base revision must be a full commit hash")
     return dict(identity=identity, projections={n: [m.in_features, m.out_features]
-                                               for n, m in projections(model).items()})
+                                               for n, m in projections(model, execution=execution).items()})
 
 
 def branch_type():
@@ -72,21 +79,23 @@ class Slider(nn.Module):
     """One shared learned bank, all-particle routing, no random particle at sample time.
 
     Host ownership remains with caller. The registered parameters are adapter-only.
-    CPU-only is deliberate until this new implementation has native qualification.
+    The NF4 path requires an externally admitted single visible CUDA device.
     """
-    def __init__(self, model, identity, *, ordinary=False):
+    def __init__(self, model, identity, *, ordinary=False, execution="cpu"):
         super().__init__()
-        self.spec = signature(model, identity)
-        targets = projections(model)
-        if any(p.device.type != "cpu" for p in model.parameters()):
-            raise ValueError("All host parameters must be on CPU")
+        self.spec = signature(model, identity, execution=execution)
+        targets = projections(model, execution=execution)
+        device = torch.device("cpu" if execution == "cpu" else "cuda:0")
+        if any(p.device != device for p in model.parameters()):
+            raise ValueError("Host offload or multiple devices are unsupported")
+        self.execution = execution
         self.ordinary = bool(ordinary)
         self.branches = nn.ModuleDict()
         self._targets = targets
         self._base_flags = [(p, p.requires_grad) for p in model.parameters()]
         model.requires_grad_(False)
         if not ordinary:
-            self.particles = nn.Parameter(torch.randn(128, 4))
+            self.particles = nn.Parameter(torch.randn(128, 4, device=device))
         cls = plain_type() if ordinary else branch_type()
         for index, (name, module) in enumerate(targets.items()):
             key = str(index)
@@ -94,7 +103,7 @@ class Slider(nn.Module):
                       else cls(name, module, self.particles))
             branch.apply_to()
             # org_module has been removed, so this cannot cast the base weights.
-            branch.to(device="cpu", dtype=torch.float32)
+            branch.to(device=device, dtype=torch.float32)
             self.branches[key] = branch
             object.__setattr__(module, "_glimmer_slider", self)
         self.strength = 0.
@@ -153,7 +162,8 @@ def distill(slider, model, calibration_inputs, *, max_rows=128):
     try:
         with slider.scaled(1.):
             for inputs in calibration_inputs:
-                model(input_ids=inputs, use_cache=False)
+                device = next(model.parameters()).device
+                model(input_ids=inputs.to(device), use_cache=False, logits_to_keep=1)
     finally:
         for hook in hooks:
             hook.remove()
@@ -162,7 +172,7 @@ def distill(slider, model, calibration_inputs, *, max_rows=128):
         if not captured[key] or sum(len(x) for x in captured[key]) < 2:
             raise ValueError("Insufficient calibration activations")
         x = torch.cat(captured[key])
-        routed = branch.routed(x)
+        routed = branch.routed(x).float().cpu()
         down, ridge = api().fit_routed_down(x, routed, ridge_fraction=.01)
         prefix = f"branches.{key}."
         state[prefix + "lora_down.weight"] = down.contiguous()

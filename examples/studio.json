@@ -1,0 +1,17 @@
+{
+  "host": "127.0.0.1",
+  "port": 8789,
+  "snapshot": "../models/PINNED_GLIMMER_REVISION",
+  "upstream": "../../particle-sliders",
+  "particle_catalog": "studio-catalog.example.json",
+  "run_dir": "../outputs/studio-session-001",
+  "gpu_uuid": "GPU-00000000-0000-0000-0000-000000000000",
+  "duration_seconds": 7200,
+  "particle_execution": "scripted",
+  "leases": [
+    "../outputs/locks/host.lock",
+    "../outputs/locks/gpu-admission.lock",
+    "../outputs/locks/gpu.lock"
+  ],
+  "protected_processes": []
+}

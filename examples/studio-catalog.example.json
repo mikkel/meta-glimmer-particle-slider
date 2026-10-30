@@ -1,0 +1,14 @@
+{
+  "entries": [
+    {
+      "id": "my-direction",
+      "title": "My direction · RAW 1024",
+      "path": "../outputs/my-slider/teacher-raw-001024.safetensors",
+      "sha256": "REPLACE_WITH_ACTUAL_SHA256",
+      "step": 1024,
+      "qualification": "Describe the checks actually performed for this checkpoint",
+      "quality_note": "Training neutral: explicit blank system content. Inference system is selected separately.",
+      "definition_version": 1
+    }
+  ]
+}

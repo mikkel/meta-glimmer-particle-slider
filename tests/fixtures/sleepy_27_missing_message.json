@@ -1,0 +1,11 @@
+{
+  "source": "Actual synthetic diagnostic, 2026-10-29 19:00 UTC; not private user prompt replay",
+  "strength": 2.7,
+  "reasoning": "high",
+  "system_condition": "custom",
+  "raw": " to=self...mmm... okay... let's see... 12 red... 9 blue... hmm... remove 4 red... so 12 minus 4... that's... 8 red... yeah... add 3 blue... 9 plus 3... that's 12 blue... hmm... total... 8 plus 12... that's... 20... yeah... okay... *yawns*... mmm... 20 marbles... okay...<|eom|><|start|>assistant to=user... *soft hum*... okay... let's see... mmm... 12 red marbles... and 9 blue... *hmm*... remove 4 red... that's... 12 minus 4... that's 8 red... *muffled*... and add 3 blue... 9 plus 3... that's 12 blue... *yawn*... mmm... so... 8 red plus 12 blue... that's... 20... *soft*... yeah... 20 marbles remain... *muffled*... okay... *hmm*...<|end_of_text|>",
+  "output_tokens": 213,
+  "strict_parsed": {
+    "role": "assistant"
+  }
+}

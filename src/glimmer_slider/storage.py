@@ -75,7 +75,7 @@ def save_adapter(store, name, slider, *, state=None, kind=None, calibration=None
         save_file(tensors, str(path), metadata={"glimmer_slider": json.dumps(record, sort_keys=True)})
 
 
-def load_adapter(model, identity, path):
+def load_adapter(model, identity, path, *, execution="cpu"):
     path = Path(path)
     if path.stat().st_size > 512 * 1024**2:
         raise ValueError("Portable adapter exceeds 512 MiB limit")
@@ -83,10 +83,10 @@ def load_adapter(model, identity, path):
         record = json.loads((handle.metadata() or {}).get("glimmer_slider", "{}"))
     if (record.get("format") not in (TEACHER, STUDENT) or record.get("upstream_revision") != REVISION
             or record.get("rank") != 8 or record.get("alpha") != 8
-            or record.get("base") != signature(model, identity)):
+            or record.get("base") != signature(model, identity, execution=execution)):
         raise ValueError("Artifact format, upstream or base identity mismatch")
     state = load_file(str(path), device="cpu")
-    network = Slider(model, identity, ordinary=record["format"] == STUDENT)
+    network = Slider(model, identity, ordinary=record["format"] == STUDENT, execution=execution)
     try:
         validate_state(state, network.state_dict())
         network.load_state_dict(state, strict=True)

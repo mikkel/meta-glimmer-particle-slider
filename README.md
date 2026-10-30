@@ -1,6 +1,25 @@
 # Meta Glimmer Particle Slider
 
-Text-tower integration for [Muse Glimmer](https://dev.meta.ai/docs/muse-glimmer), using the original [HyperGAN/particle-sliders](https://github.com/HyperGAN/particle-sliders) ParticleGAN training API. This is a library and local command-line runner. It does not include model weights or a hosted inference client.
+Text-tower integration for [Muse Glimmer](https://dev.meta.ai/docs/muse-glimmer), using the original [HyperGAN/particle-sliders](https://github.com/HyperGAN/particle-sliders) ParticleGAN training API. This is a library, local command-line runner and private particle Slider Studio. Model weights and a hosted service are not included.
+
+## Particle Slider Studio
+
+![Particle Slider Studio with independent Thinking, Response and Both controls](docs/assets/slider-studio.jpg)
+
+The real UI shown above is in model-free preview mode with a genuinely recorded
+Sleepy response loaded from a saved run; it is not a new inference result. The
+preview and screenshot contain no model weights or private prompts.
+
+The studio streams model reasoning and final answers separately, preserves exact
+slider/checkpoint provenance per response, supports signed multi-slider mixes,
+and gives each slider independent **Thinking / Response / Both** execution scope.
+Both is the default; thinking can still influence answers through cached states.
+An optional tested raw-particle inference program reuses compiled adapters across
+alpha changes. Read [setup, guarded launch, preview, limits and validation](docs/sampler-studio.md).
+No authentication is added: bind only to loopback or your existing private Tailscale
+interface. The portable launcher is a draft integration with a [bounded full-model inference
+smoke](docs/studio-native-smoke.json); no hosted service or training qualification
+is implied by this PR.
 
 ## Installation and CPU tests
 
@@ -29,7 +48,7 @@ A: input -> rank 8; U: rank 8 -> actual projection width
 router width 16; branch width 48; alpha/rank = 8/8 = 1
 ```
 
-`RoutedMLP` comes from the core `winning_formulation().bridge()`. It routes each input over all particles with softmax; inference uses the learned bank deterministically. It does not draw a random particle. Strength zero bypasses the entire adapter, including after trained weights are reloaded. Only `model.language_model.layers.N.self_attn.{q_proj,k_proj,v_proj,o_proj}` are selected. Grouped KV widths are read from the real modules. Vision and MLP projections are excluded. One concept is attached at a time; there is no multi-concept mixer.
+`RoutedMLP` comes from the core `winning_formulation().bridge()`. It routes each input over all particles with softmax; inference uses the learned bank deterministically. It does not draw a random particle. Strength zero bypasses the entire adapter, including after trained weights are reloaded. Only `model.language_model.layers.N.self_attn.{q_proj,k_proj,v_proj,o_proj}` are selected. Grouped KV widths are read from the real modules. Vision and MLP projections are excluded. Training attaches one concept per run. The private studio can combine compatible raw particle adapters on one resident base without merging weights.
 
 `Trainer.step()` calls upstream `conceptmod.textsliders.particle_bridge_gan.update` directly. This is the upstream full-model prediction callback API, rather than the core feature-only `FormulationGame`, which expects rank-eight features. The adapter bridge and training settings follow the current core stamp: gmix critic (8 tokens, width 48, one layer, four heads, score bound 8), adversarial batch 8, Adam rates G=.0006/D=.0009/particles=.006, betas=(0,.999), particle VIC on 64 particles, EMA=.995. The noise schedule remains the stamp's 1,600-step schedule even when an invocation stops earlier. The original API owns D/G updates and the lazy b_cap penalty. Tests compare its losses, critic, normalization, VIC and penalty numerically with the current core stamp. Anima's model-specific generator learning-rate override and image diffusion data pipeline are not imported.
 

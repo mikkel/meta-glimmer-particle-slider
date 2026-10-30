@@ -45,3 +45,17 @@ def test_guard_terminates_owned_worker_before_releasing_locks(tmp_path,monkeypat
     import fcntl
     for name in config['leases']:
         with open(name,'rb') as f:fcntl.flock(f,fcntl.LOCK_EX|fcntl.LOCK_NB)
+
+
+def test_busy_listener_fails_before_model_loading_or_ready_receipt(tmp_path,monkeypatch):
+    import socket
+    from glimmer_slider import studio
+    monkeypatch.setattr(studio,'validate_runtime',lambda plan:None)
+    monkeypatch.setattr(studio,'catalog_particles',lambda path:[object()])
+    def forbidden(*args,**kwargs):raise AssertionError('A busy listener must fail before loading')
+    monkeypatch.setattr(studio,'load_demo_local',forbidden)
+    with socket.socket() as occupied:
+        occupied.bind(('127.0.0.1',0));occupied.listen()
+        plan=dict(host='127.0.0.1',port=occupied.getsockname()[1],attempt=str(tmp_path/'attempt'),particle_catalog='unused')
+        with pytest.raises(OSError):studio.run(plan)
+    assert not (tmp_path/'attempt'/'ready.json').exists()

@@ -1,0 +1,188 @@
+{
+  "scope": "Bounded inference-only portable launcher smoke; no training or deployment",
+  "model_id": "meta-models/Muse-Glimmer-30B",
+  "model_revision": "a4e59da52a7bc87ae7251dd5545c0dd437c44b68",
+  "execution": "NF4 base, scripted raw particle adapters, one loaded base per attempt",
+  "environment": {
+    "torch": "2.12.1+cu130",
+    "transformers": "5.20.2",
+    "bitsandbytes": "0.50.2",
+    "accelerate": "1.15.0"
+  },
+  "catalog_count": 14,
+  "strength_zero_exact": true,
+  "training_updates": 0,
+  "first_attempt": {
+    "outcome": "Port busy after weight load; owned allocation cleaned up",
+    "elapsed_seconds": 79.355,
+    "regression_fix": "Reserve port before model load; activate listener and write ready receipt only after startup"
+  },
+  "successful_attempt": {
+    "started_UTC": "2026-10-30T13:50:09.366914+00:00",
+    "ready_UTC": "2026-10-30T13:51:28.222500+00:00",
+    "finished_UTC": "2026-10-30T13:52:02.641068+00:00",
+    "elapsed_seconds": 113.274,
+    "HTTP": 200,
+    "UI_scope_control": true,
+    "samples": [
+      {
+        "name": "direct",
+        "request": {
+          "system": "",
+          "system_condition": "explicit_blank",
+          "seed": 7,
+          "temperature": 0,
+          "top_p": 0.95,
+          "top_k": 50,
+          "repetition_penalty": 1,
+          "prompt": "Name two colors.",
+          "strengths": {
+            "sleepy": 0.5,
+            "chaotic-texting": 0.25
+          },
+          "scopes": {
+            "sleepy": "response",
+            "chaotic-texting": "thinking"
+          },
+          "max_new_tokens": 96,
+          "mode": "direct_final",
+          "reasoning": "low"
+        },
+        "output_tokens": 11,
+        "termination": "eos",
+        "answer": "Here are two colors: teal and lavender.",
+        "reasoning_characters": 0,
+        "reasoning_frames": 0,
+        "answer_frames": 12,
+        "reasoning_before_answer": false,
+        "text_before_complete": true,
+        "scope_gating": {
+          "scopes": {
+            "chaotic-texting": "thinking",
+            "sleepy": "response"
+          },
+          "transitions": [
+            "response",
+            "unknown"
+          ],
+          "unknown_policy": "Both stays active; Thinking/Response are off while recipient is unknown",
+          "semantics": "Gates next prediction at token callbacks, including prompt prefill. Boundary tokens use the preceding gate; KV state may carry prior influence. Not answer isolation."
+        },
+        "effective_sliders": [
+          {
+            "id": "chaotic-texting",
+            "name": "Chaotic Texting · BLANK · RAW 1024",
+            "strength": 0.25,
+            "scope": "thinking",
+            "step": 1024,
+            "sha256": "444122b24612ac2aca22defe7be43e697afa87cdfb88e3d5c95d31db2da10cd9",
+            "definition_version": 2,
+            "kind": "glimmer-particle-teacher-v1"
+          },
+          {
+            "id": "sleepy",
+            "name": "Sleepy · BLANK · RAW 1024",
+            "strength": 0.5,
+            "scope": "response",
+            "step": 1024,
+            "sha256": "36cf8e34ed1082d8edc71a144a9c82c4ac7cb588208fcdccb61524270c3b940d",
+            "definition_version": 1,
+            "kind": "glimmer-particle-teacher-v1"
+          }
+        ],
+        "elapsed_seconds": 10.851
+      },
+      {
+        "name": "reasoning",
+        "request": {
+          "system": "",
+          "system_condition": "explicit_blank",
+          "seed": 7,
+          "temperature": 0,
+          "top_p": 0.95,
+          "top_k": 50,
+          "repetition_penalty": 1,
+          "prompt": "Which is larger: 9.11 or 9.9? Keep reasoning brief and answer in one sentence.",
+          "strengths": {
+            "sleepy": 0.25,
+            "chaotic-texting": 0.25
+          },
+          "scopes": {
+            "sleepy": "thinking",
+            "chaotic-texting": "response"
+          },
+          "max_new_tokens": 384,
+          "mode": "reasoning",
+          "reasoning": "low"
+        },
+        "output_tokens": 147,
+        "termination": "eos",
+        "answer": "9.9 is larger because 9.9 = 9.90 which exceeds 9.11.",
+        "reasoning_characters": 312,
+        "reasoning_frames": 115,
+        "answer_frames": 24,
+        "reasoning_before_answer": true,
+        "text_before_complete": true,
+        "scope_gating": {
+          "scopes": {
+            "chaotic-texting": "response",
+            "sleepy": "thinking"
+          },
+          "transitions": [
+            "unknown",
+            "thinking",
+            "unknown",
+            "response",
+            "unknown"
+          ],
+          "unknown_policy": "Both stays active; Thinking/Response are off while recipient is unknown",
+          "semantics": "Gates next prediction at token callbacks, including prompt prefill. Boundary tokens use the preceding gate; KV state may carry prior influence. Not answer isolation."
+        },
+        "effective_sliders": [
+          {
+            "id": "chaotic-texting",
+            "name": "Chaotic Texting · BLANK · RAW 1024",
+            "strength": 0.25,
+            "scope": "response",
+            "step": 1024,
+            "sha256": "444122b24612ac2aca22defe7be43e697afa87cdfb88e3d5c95d31db2da10cd9",
+            "definition_version": 2,
+            "kind": "glimmer-particle-teacher-v1"
+          },
+          {
+            "id": "sleepy",
+            "name": "Sleepy · BLANK · RAW 1024",
+            "strength": 0.25,
+            "scope": "thinking",
+            "step": 1024,
+            "sha256": "36cf8e34ed1082d8edc71a144a9c82c4ac7cb588208fcdccb61524270c3b940d",
+            "definition_version": 1,
+            "kind": "glimmer-particle-teacher-v1"
+          }
+        ],
+        "elapsed_seconds": 23.243
+      }
+    ]
+  },
+  "cleanup": {
+    "worker_gone": true,
+    "oom_unchanged": true,
+    "protected_processes_unchanged": true,
+    "gpu_allocation_released": true
+  },
+  "all_three_locks_free": true,
+  "aggregate_guarded_GPU_seconds": 192.629,
+  "limitations": [
+    "One local full-model smoke, not a performance or robustness benchmark",
+    "API streaming and served UI bytes checked; no new browser recording for this native run",
+    "Scope transitions verify routing integration; cached states can carry influence across channels",
+    "No training qualification, model weights, private configuration or service deployment included"
+  ],
+  "source_sha256": {
+    "src/glimmer_slider/studio.py": "4dada79538c996a17ba2c5389aa336d01563e60473d0acb45814f3fc39eb1d25",
+    "src/glimmer_slider/studio_guard.py": "64eb93c084496828a4e652de1beec81f7dceb534cb002a6cf7244faeae8e1dfa",
+    "src/glimmer_slider/sampler_stream.py": "de3190686b207b31c95391e5fec5420e4f196f7a443f7eadd38090ac0a37d60f",
+    "src/glimmer_slider/generation_scope.py": "bf7bf638fc9205411826d2f37852ea848c788eee96c710da5084d5a455cc2588",
+    "src/glimmer_slider/particle_inference.py": "322c0d23147e591510d5a904affaa4a565ab83991ed4c1aad8e4a0a86cdfa9f2"
+  }
+}

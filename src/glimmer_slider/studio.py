@@ -16,7 +16,7 @@ from .restored_sampler import LabeledRequest,catalog_particles,prompt_tokens,ORI
 from .studio_config import load_config,validate_runtime
 
 
-def serve(plan,artifacts,model=None,tokenizer=None,sliders=None,ids=None):
+def serve(plan,artifacts,model=None,tokenizer=None,sliders=None,ids=None,*,server):
     backend=StreamingBackend(model,tokenizer,sliders) if sliders is not None else None
     class Queue(StreamingQueue):
         catalog_sha=hashlib.sha256(Path(plan['particle_catalog']).read_bytes()).hexdigest()
@@ -55,8 +55,8 @@ def serve(plan,artifacts,model=None,tokenizer=None,sliders=None,ids=None):
                 return self.reply(200,Path(__file__).with_name('studio.html').read_bytes(),'text/html; charset=utf-8')
             return super().do_GET()
     ready=dict(runtime.state(),UTC=datetime.now(timezone.utc).isoformat(),url=f"http://{plan['host']}:{plan['port']}/",strength_zero_exact=sliders is not None,training_updates=0)
+    server.RequestHandlerClass=Handler;server.daemon_threads=True;server.server_activate()
     atomic_json(Path(plan['attempt'])/'ready.json',ready)
-    server=ThreadingHTTPServer((plan['host'],plan['port']),Handler);server.daemon_threads=True
     server.serve_forever()
 
 
@@ -64,18 +64,21 @@ def run(plan):
     validate_runtime(plan);attempt=Path(plan['attempt']);attempt.mkdir(parents=True,exist_ok=True)
     artifacts=catalog_particles(plan['particle_catalog'])
     if not artifacts:raise ValueError('Catalog requires at least one verified raw particle adapter')
-    if plan.get('preview'):return serve(plan,artifacts)
-    load_upstream(plan['upstream']);torch.set_num_threads(2);torch.use_deterministic_algorithms(True)
-    with cuda_heartbeat(attempt,plan['gpu_uuid']):
-        model,tokenizer,identity=load_demo_local(plan['snapshot'],expected_gpu_uuid=plan['gpu_uuid'],guardian_pid=os.getppid())
-        request=LabeledRequest.parse(dict(system_condition='explicit_blank',prompt='Say hello.',strengths={},max_new_tokens=8),[a.id for a in artifacts])
-        ids=prompt_tokens(tokenizer,request).to(next(model.parameters()).device)
-        with torch.inference_mode():before=model(input_ids=ids,use_cache=False,logits_to_keep=1).logits.cpu()
-        sliders=ResidentSliders(model,identity,artifacts,execution='nf4',particle_execution=plan.get('particle_execution','scripted'))
-        with torch.inference_mode(),sliders.using({}):after=model(input_ids=ids,use_cache=False,logits_to_keep=1).logits.cpu()
-        if not torch.equal(before,after):raise RuntimeError('Resident OFF changed base logits')
-        serve(plan,artifacts,model,tokenizer,sliders,ids)
-
+    # Reserve the listener before any expensive model load; a busy address must
+    # fail before CUDA allocation and never leave a false ready receipt.
+    with ThreadingHTTPServer((plan['host'],plan['port']),None,bind_and_activate=False) as server:
+        server.server_bind()
+        if plan.get('preview'):return serve(plan,artifacts,server=server)
+        load_upstream(plan['upstream']);torch.set_num_threads(2);torch.use_deterministic_algorithms(True)
+        with cuda_heartbeat(attempt,plan['gpu_uuid']):
+            model,tokenizer,identity=load_demo_local(plan['snapshot'],expected_gpu_uuid=plan['gpu_uuid'],guardian_pid=os.getppid())
+            request=LabeledRequest.parse(dict(system_condition='explicit_blank',prompt='Say hello.',strengths={},max_new_tokens=8),[a.id for a in artifacts])
+            ids=prompt_tokens(tokenizer,request).to(next(model.parameters()).device)
+            with torch.inference_mode():before=model(input_ids=ids,use_cache=False,logits_to_keep=1).logits.cpu()
+            sliders=ResidentSliders(model,identity,artifacts,execution='nf4',particle_execution=plan.get('particle_execution','scripted'))
+            with torch.inference_mode(),sliders.using({}):after=model(input_ids=ids,use_cache=False,logits_to_keep=1).logits.cpu()
+            if not torch.equal(before,after):raise RuntimeError('Resident OFF changed base logits')
+            serve(plan,artifacts,model,tokenizer,sliders,ids,server=server)
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--config',required=True,type=Path);parser.add_argument('--preview',action='store_true');args=parser.parse_args()

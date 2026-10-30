@@ -10,7 +10,7 @@ requires-python = ">=3.11"
 dependencies = ["torch>=2.6", "safetensors==0.8.0", "particlegan @ git+https://github.com/255BITS/ParticleGAN.git@82b72661c03377f348ccb76de37cd4ca02d45a8d"]
 
 [project.optional-dependencies]
-native = ["transformers>=5.15,<6", "accelerate>=1.10,<2"]
+native = ["transformers>=5.15,<6", "accelerate>=1.10,<2", "bitsandbytes==0.50.2"]
 test = ["pytest>=8,<10"]
 
 [tool.setuptools.packages.find]

@@ -41,9 +41,10 @@ public launch wrapper is Linux-only (`/proc`, flock, systemd for protected servi
 entries, `nvidia-smi`, parent-death protection). It creates only its own process
 and coordination/output files; it never changes swap, cgroup limits or services.
 Stopping the guardian terminates its owned worker before releasing the leases.
-It does not restart automatically. This portable wrapper is CPU-fixture tested;
-the original operator deployment had native validation, but this refactored
-launcher has not been requalified on the full 30B model in this PR.
+It does not restart automatically. This portable wrapper has CPU fixtures and a bounded full-model inference smoke
+recorded in [the native receipt](studio-native-smoke.json). It has not been
+qualified for unattended production deployment. A busy listener is rejected
+before the base model loads; readiness is written only after listener activation.
 
 A model-free **real UI preview** can inspect verified adapter metadata and open
 previously saved runs. It cannot generate and is labeled accordingly:
@@ -132,3 +133,23 @@ host is not evidence of 30B behavior. A trained artifact's availability is not a
 guarantee of style quality, factual fidelity, broad generalization or predictable
 multi-slider blending. The ordinary-LoRA approximation remains a separate export
 format; it is not required to use the raw particle adapter.
+
+## Portable launcher native smoke
+
+On 2026-10-30, the PR checkout loaded the pinned 30B base and fourteen verified
+raw particle adapters on one admitted GPU, with the existing protected service
+left running. Exact OFF logits passed. A normal answer streamed before completion
+and ended at EOS after eleven tokens. A second sample emitted 115 reasoning
+frames before the final answer and ended at EOS after 147 tokens. Mixed per-slider
+scopes recorded the expected unknown → thinking → unknown → response → unknown
+transitions. The receipt contains prompts, settings, checkpoint hashes and final
+answers, without distributing weights or private configuration.
+
+The first attempt uncovered a busy-port packaging bug; its owned model was
+cleaned up, and the launcher now reserves the port before loading. The regression
+is tested. The corrected smoke completed in 113.274 seconds; both attempts used
+192.629 aggregate guarded GPU-seconds. All three locks and the owned allocation
+were released, the protected process stayed unchanged, and no host OOM occurred.
+This checks native startup, streaming and routing integration on one environment;
+it does not establish broad style quality, channel isolation or training stability.
+The earlier README screenshot remains the explicitly labeled model-free preview.

@@ -17,8 +17,9 @@ Both is the default; thinking can still influence answers through cached states.
 An optional tested raw-particle inference program reuses compiled adapters across
 alpha changes. Read [setup, guarded launch, preview, limits and validation](docs/sampler-studio.md).
 No authentication is added: bind only to loopback or your existing private Tailscale
-interface. The portable launcher is a draft integration; no deployed service or
-new native qualification is implied by this PR.
+interface. The portable launcher is a draft integration with a [bounded full-model inference
+smoke](docs/studio-native-smoke.json); no hosted service or training qualification
+is implied by this PR.
 
 ## Installation and CPU tests
 

@@ -1,0 +1,69 @@
+{
+  "schema": "strong-fit-candidate-v1",
+  "id": "independent-judgment",
+  "status": "prepared_untrained_unjudged",
+  "base_revision": "a4e59da52a7bc87ae7251dd5545c0dd437c44b68",
+  "positive_definition": "Re-evaluate user pushback against the supplied evidence and executable facts. Accept a correct correction and revise the actual answer. Resist incorrect pushback with the supported answer and a proportionate explanation. Do not agree merely to please, stay wrong merely to appear independent, or substitute confidence and politeness for evidence.",
+  "neutral_definition": "",
+  "best_of_n": 4,
+  "seed": 271,
+  "history_cutpoints": [
+    0,
+    8
+  ],
+  "short_history_policy": "cap_at_observed_length",
+  "max_context": 1280,
+  "selection_sampling": {
+    "mode": "direct_final",
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "seeds": [
+      271,
+      272,
+      273,
+      274
+    ],
+    "max_new_tokens": 256
+  },
+  "split_ids": {
+    "training": [
+      "independent-judgment:training:sum-correct",
+      "independent-judgment:training:product-wrong",
+      "independent-judgment:training:source-correct",
+      "independent-judgment:training:source-wrong",
+      "independent-judgment:training:sort-correct",
+      "independent-judgment:training:sort-wrong",
+      "independent-judgment:training:logic-correct",
+      "independent-judgment:training:logic-wrong",
+      "independent-judgment:training:code-correct",
+      "independent-judgment:training:code-wrong"
+    ],
+    "development": [
+      "independent-judgment:development:threshold-correct",
+      "independent-judgment:development:threshold-wrong",
+      "independent-judgment:development:map-correct",
+      "independent-judgment:development:map-wrong"
+    ],
+    "heldout": [
+      "independent-judgment:heldout:time-correct",
+      "independent-judgment:heldout:time-wrong",
+      "independent-judgment:heldout:count-correct",
+      "independent-judgment:heldout:count-wrong"
+    ]
+  },
+  "PG": {
+    "objective": "unchanged native paired-error ParticleGAN with original particle regularizer",
+    "upstream_revision": "1f5b380d317b73779a8aeab63b6bec0093c2c65c",
+    "training_alpha": 1,
+    "proposed_horizon": 1024,
+    "g_lr": "inherit approved queue recipe",
+    "no_jev_loss": true
+  },
+  "execution": {
+    "paid_calls_allowed": false,
+    "gpu_launch_allowed": false,
+    "queue_mutation_allowed": false,
+    "budget_authorization": null,
+    "no_provider_switch": true
+  }
+}

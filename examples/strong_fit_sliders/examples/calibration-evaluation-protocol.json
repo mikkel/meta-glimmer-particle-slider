@@ -1,0 +1,43 @@
+{
+  "schema": "strong-fit-eval-v1",
+  "config_sha256": "356e4ee72a48ed69f183468015db712108c48cdd499cdb504bd6961a6de8a274",
+  "arms": [
+    "base",
+    "plain_instruction",
+    "slider",
+    "best_of_n"
+  ],
+  "generations_per_arm_per_case": 4,
+  "seeds": [
+    271,
+    272,
+    273,
+    274
+  ],
+  "max_new_tokens": 256,
+  "decoding": {
+    "mode": "direct_final",
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "seeds": [
+      271,
+      272,
+      273,
+      274
+    ],
+    "max_new_tokens": 256
+  },
+  "primary": "prespecified first seed for base/plain/slider; public Jev selected response for best_of_n",
+  "secondary": "all-seed pass rate per arm; no target selection from private heldout gold",
+  "length_bins": [
+    32,
+    64,
+    128,
+    256
+  ],
+  "token_budget_hit": "failure, never score the visible portion as complete",
+  "heldout_use": "score once after alpha/checkpoint/thresholds are frozen on development",
+  "budgets": "N generations in every arm, identical seeds/caps; record extra public Jev selection usage separately",
+  "controls": "compare paired cases, subgroup rates and observed lengths; no improvement claim from polish or hidden RMS",
+  "statistical_limit": "four heldout cases per slider are illustrative smoke tests, insufficient for a general competence claim"
+}

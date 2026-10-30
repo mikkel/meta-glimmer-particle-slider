@@ -4,6 +4,21 @@ Text-tower integration for [Muse Glimmer](https://dev.meta.ai/docs/muse-glimmer)
 
 ## Installation and CPU tests
 
+For the verifier-gated **Calibration**, **Constraint Precision**, and **Independent Judgment**
+candidate examples, see [strong-fit slider flows](examples/strong_fit_sliders/README.md).
+They include 54 frozen synthetic cases, exact checks before typed Jev selection,
+native PG history-packet preparation, and separate development/heldout comparisons.
+Run their offline checks without model weights, torch, credentials or paid calls:
+
+```bash
+PYTHONPATH=examples python3 -m unittest discover -s examples/strong_fit_sliders/tests -v
+PYTHONPATH=examples python3 -m strong_fit_sliders validate --slider calibration
+PYTHONPATH=examples python3 -m strong_fit_sliders questions
+```
+
+These are untrained candidate workflows; native stochastic/direct-final generation,
+live Jev judgments and learned-slider performance have not been qualified.
+
 Use a dedicated environment and a CPU PyTorch installation for the fixture tests:
 
 ```bash

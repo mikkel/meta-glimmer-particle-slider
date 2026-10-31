@@ -1,0 +1,27 @@
+name: Modern Glimmer response CPU
+on:
+  pull_request:
+    paths:
+      - 'packages/glimmer-modern-response/**'
+      - '.github/workflows/modern-response-cpu.yml'
+  push:
+    paths:
+      - 'packages/glimmer-modern-response/**'
+      - '.github/workflows/modern-response-cpu.yml'
+jobs:
+  installed-cpu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --index-url https://download.pytorch.org/whl/cpu 'torch>=2.6,<3'
+      - run: python -m pip install 'setuptools>=84.2.1' build
+      - run: python -m build --no-isolation packages/glimmer-modern-response --outdir /tmp/glimmer-dist
+      - run: python -m pip install '/tmp/glimmer-dist/meta_glimmer_modern_response-0.1.0-py3-none-any.whl[test]'
+      - name: Installed wheel conformance outside source tree
+        run: |
+          cd /tmp
+          python -I -m pytest "$GITHUB_WORKSPACE/packages/glimmer-modern-response/tests" --import-mode=importlib -q
+      - run: python -m pip check

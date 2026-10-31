@@ -1,0 +1,56 @@
+{
+  "artifacts": {
+    "meta_glimmer_modern_response-0.1.0-py3-none-any.whl": "5f8dc4d6d751c21145099bedd1264b6e0b2a455f90e7d8527955cd3751e66a68",
+    "meta_glimmer_modern_response-0.1.0.tar.gz": "13f8848573db1fb2ee96cfa8418c5f6d9304517a883b8b245bb64fb9016fcc40"
+  },
+  "base": "a64d66484fd362c2da70cb8829f9949c75551a3e",
+  "central_admission": "PENDING; candidate4abc0eb source lock is CPU-only provisional; native/wide gates remain closed",
+  "ci": "Workflow push rejected by GitHub OAuth: missing workflow scope. No remote branch created by rejected push. CI YAML retained as docs/glimmer-modern-ci-proposal.yml; no permission changes or workflow retry.",
+  "commands": [
+    "python3 -m venv .wheel-venv",
+    ".wheel-venv/bin/python -m pip install --index-url https://download.pytorch.org/whl/cpu 'torch>=2.6,<3'",
+    ".wheel-venv/bin/python -m pip install --report output/public-resolution.json 'output/meta_glimmer_modern_response-0.1.0-py3-none-any.whl[test]'",
+    ".venv/bin/python -m build --no-isolation --outdir output glimmer-modern/packages/glimmer-modern-response",
+    ".wheel-venv/bin/python -m pip install --force-reinstall --no-deps output/meta_glimmer_modern_response-0.1.0-py3-none-any.whl",
+    "cd /tmp && /ml2/codex-storage/future-workspaces/2026-10-31/task-29/.wheel-venv/bin/python -I -m pytest /ml2/codex-storage/future-workspaces/2026-10-31/task-29/glimmer-modern/packages/glimmer-modern-response/tests --import-mode=importlib -q",
+    ".wheel-venv/bin/python -m pip install setuptools==84.2.1",
+    ".wheel-venv/bin/python -m pip install --force-reinstall --no-deps --no-build-isolation output/meta_glimmer_modern_response-0.1.0.tar.gz",
+    "cd /tmp && /ml2/codex-storage/future-workspaces/2026-10-31/task-29/.wheel-venv/bin/python -I -m pytest /ml2/codex-storage/future-workspaces/2026-10-31/task-29/glimmer-modern/packages/glimmer-modern-response/tests --import-mode=importlib -q",
+    ".wheel-venv/bin/python -m pip check",
+    "git diff --exit-code a64d66484fd362c2da70cb8829f9949c75551a3e -- src pyproject.toml README.md examples tests"
+  ],
+  "cuda_initialized": false,
+  "installed_sources": {
+    "packages/glimmer-modern-response/LICENSE": "2b61d4a8dd7a958b99133a92e92eede6f5e8b0f7b44d234665f822051e530685",
+    "packages/glimmer-modern-response/README.md": "3d89bcf61a5e67cfab3258d3ebefda765182e820552d7ef55f8af141b1cce683",
+    "packages/glimmer-modern-response/pyproject.toml": "3956a4b90d5ce2608531a8a48edf4c41beb0fd94204cf6e6e469b0f7f5e25d50",
+    "packages/glimmer-modern-response/src/glimmer_modern/__init__.py": "41cb94f2bfe2d0977539aff73b89295a9eb0617fbf9f11b0aa65ff90b2cb6e4c",
+    "packages/glimmer-modern-response/src/glimmer_modern/fixture.py": "db02c302cf67b94e12381bb77277719efb3964f3ef04cbd36f9b8d9c91102ce8",
+    "packages/glimmer-modern-response/src/glimmer_modern/lifecycle.py": "f667a7d7d74a1860a18223b66a9bc74664191f5ffbac01e1bd45711d86395c3d",
+    "packages/glimmer-modern-response/src/glimmer_modern/native.py": "4f2e60d94f5ea7f17fcd79c9712ef7528ec6cae5b691b5c222fc738078fc0620",
+    "packages/glimmer-modern-response/src/glimmer_modern/provenance.py": "108c5ab6e2576c826dd7eb2c77e4a91fd32855469f4a4091096819c2920e999f",
+    "packages/glimmer-modern-response/src/glimmer_modern/readout.hndl": "b9fe063e244b23f8432872f7f0a8128993432694a753d38d5919f4c63d2d9209",
+    "packages/glimmer-modern-response/src/glimmer_modern/source-lock.json": "7d80ab7ef978e971b6c9fff47451e3e3efa42f0af5529aafb1f88d06f52994a1",
+    "packages/glimmer-modern-response/tests/test_modern.py": "09aa88724586e9865507b736393d024b7d4a07e3fd82da88e0c1ed1e7ab603ee"
+  },
+  "original_tracked_files_verified_unchanged": 51,
+  "python": "3.14.4",
+  "release_impact": "No model/package release, HF write, default dependency change, ownership transfer, protected checkout edit, native/GPU training or merge",
+  "schema": "glimmer-modern-cpu-validation-v1",
+  "shared_api_gap": "lifecycle.SliderSession.close and inference.InferenceSession.close mark closed before binding.close; callback failure blocks public retry. Product cleanup attempts all owned stages; shared lifecycle corrections require central owner review.",
+  "tests": {
+    "sdist-tests.log": "............................                                             [100%]\n28 passed in 5.79s",
+    "wheel-tests.log": "............................                                             [100%]\n28 passed in 5.96s"
+  },
+  "versions": {
+    "hndl": "0.10.0",
+    "hypergan": "2.0.0",
+    "meta-glimmer-modern-response": "0.1.0",
+    "numpy": "2.5.4",
+    "particle-sliders-core": "0.12.0",
+    "particlegan": "0.9.4",
+    "pytest": "9.2.0",
+    "setuptools": "84.2.1",
+    "torch": "2.15.0+cpu"
+  }
+}

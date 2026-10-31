@@ -1,0 +1,4 @@
+joined = concat(response, condition, axis=1)
+features = linear(joined, 16, name="hidden")
+features = silu(features)
+linear(features, 1, name="logits")

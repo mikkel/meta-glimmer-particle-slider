@@ -1,0 +1,88 @@
+{
+  "artifacts": {
+    "meta_glimmer_modern_response-0.1.0-py3-none-any.whl": "939351c8840b6715367073404774f6b630336011bb9228e963fc9b338e3ae79e",
+    "meta_glimmer_modern_response-0.1.0.tar.gz": "c9f1bfa2ed9de33e7d0be886041e03574afde715c5d922fd018f9179ac35cb1e"
+  },
+  "base": "a64d66484fd362c2da70cb8829f9949c75551a3e",
+  "central_admission": "PENDING; candidate4abc0eb source lock is CPU-only provisional; native/wide gates remain closed",
+  "ci": "Workflow push rejected by GitHub OAuth: missing workflow scope. No remote branch created by rejected push. CI YAML retained as docs/glimmer-modern-ci-proposal.yml; no permission changes or workflow retry.",
+  "commands": [
+    "python3 -m venv .wheel-venv",
+    ".wheel-venv/bin/python -m pip install --index-url https://download.pytorch.org/whl/cpu 'torch>=2.6,<3'",
+    ".wheel-venv/bin/python -m pip install --report output/public-resolution.json 'output/meta_glimmer_modern_response-0.1.0-py3-none-any.whl[test]'",
+    ".venv/bin/python -m build --no-isolation --outdir output glimmer-modern/packages/glimmer-modern-response",
+    ".wheel-venv/bin/python -m pip install --force-reinstall --no-deps output/meta_glimmer_modern_response-0.1.0-py3-none-any.whl",
+    "cd /tmp && /ml2/codex-storage/future-workspaces/2026-10-31/task-29/.wheel-venv/bin/python -I -m pytest /ml2/codex-storage/future-workspaces/2026-10-31/task-29/glimmer-modern/packages/glimmer-modern-response/tests --import-mode=importlib -q",
+    ".wheel-venv/bin/python -m pip install setuptools==84.2.1",
+    ".wheel-venv/bin/python -m pip install --force-reinstall --no-deps --no-build-isolation output/meta_glimmer_modern_response-0.1.0.tar.gz",
+    "cd /tmp && /ml2/codex-storage/future-workspaces/2026-10-31/task-29/.wheel-venv/bin/python -I -m pytest /ml2/codex-storage/future-workspaces/2026-10-31/task-29/glimmer-modern/packages/glimmer-modern-response/tests --import-mode=importlib -q",
+    ".wheel-venv/bin/python -m pip check",
+    "git diff --exit-code a64d66484fd362c2da70cb8829f9949c75551a3e -- src pyproject.toml README.md examples tests"
+  ],
+  "cuda_initialized": false,
+  "historical_pg82_sha256": {
+    "pyproject.toml": "34e4b27439890f29a90a120c7811c8dfc1134ef178e22666be3f475a400b5bf3",
+    "src/glimmer_slider/training.py": "cc5aeecb7ddc6ede4abd707c8c17279a7f6d0bcdbc54ff4578f09f8d5c23bad0",
+    "src/glimmer_slider/upstream.py": "2d53cd8f314f796da8bbe0ffa4d50a6f4fb09dd3018d0fe01d6b18c781f1aee4"
+  },
+  "initialization_correction": {
+    "base_seed": "original model_seed mapping retained",
+    "cohort": "glimmer-modern-final-hidden-hg-hndl-v2-cpu",
+    "policy": "cpu-sha256-component-streams-v1",
+    "reviewed_head": "eb1ffe377f0209b44823e8ee653c55d7efc9706e",
+    "rng": "CPU caller state restored on success and failures; CUDA initialization/RNG APIs forbidden in CPU regression tests",
+    "seed": "declared run seed; separate named bank/projection/critic streams",
+    "tests": [
+      "same declared config under caller seeds111/222 gives identical initial checkpoint and all parameter/state bytes",
+      "run seed8 versus7 changes actual bank/adapter/critic tensors with model_seed41 base unchanged",
+      "low-level construction independent of caller seeds444/555",
+      "partial bank/projection/critic failures restore caller RNG and leave model unmodified",
+      "v1 cohort/policy requests rejected; original v1 source behavior retained at old commit, no relabeling"
+    ]
+  },
+  "installed_sources": {
+    "packages/glimmer-modern-response/LICENSE": "2b61d4a8dd7a958b99133a92e92eede6f5e8b0f7b44d234665f822051e530685",
+    "packages/glimmer-modern-response/README.md": "dcf3411956492eb17c734209878aeb7e3e206569fa5a7945540f0708448c735e",
+    "packages/glimmer-modern-response/pyproject.toml": "3956a4b90d5ce2608531a8a48edf4c41beb0fd94204cf6e6e469b0f7f5e25d50",
+    "packages/glimmer-modern-response/src/glimmer_modern/__init__.py": "8cda3698b9eb767ce1192c6715ca5725463e71037e8b9489f76b75d1c535140a",
+    "packages/glimmer-modern-response/src/glimmer_modern/fixture.py": "dd9636d3c8163044d4f375d1ee30bdd7bdd9f3cb1e81e720a73eb620dac1636f",
+    "packages/glimmer-modern-response/src/glimmer_modern/initialization.py": "463327ce771f37e63bea2da0840fd8b81a45027566c12532edeb87a4c6c53f9b",
+    "packages/glimmer-modern-response/src/glimmer_modern/lifecycle.py": "8a345ca43823d19bdc8787b058a7aff0e4c64f8639dd90006a79f7a2e254a6fd",
+    "packages/glimmer-modern-response/src/glimmer_modern/native.py": "82551e3c396b5aa41f1f7f7ef39de6c4830ed7c059fd5a53377d3f5e1f73ed58",
+    "packages/glimmer-modern-response/src/glimmer_modern/provenance.py": "108c5ab6e2576c826dd7eb2c77e4a91fd32855469f4a4091096819c2920e999f",
+    "packages/glimmer-modern-response/src/glimmer_modern/readout.hndl": "b9fe063e244b23f8432872f7f0a8128993432694a753d38d5919f4c63d2d9209",
+    "packages/glimmer-modern-response/src/glimmer_modern/source-lock.json": "7d80ab7ef978e971b6c9fff47451e3e3efa42f0af5529aafb1f88d06f52994a1",
+    "packages/glimmer-modern-response/tests/test_modern.py": "3e24333c08cdb810f097aaa1713d5b12e6756c55f71360e26b070f150fe28ed9"
+  },
+  "original_tracked_files_verified_unchanged": 51,
+  "packet_admission_gap": "Deep packet/source/tensor qualification may run after factory preparation in provisional4abc. These product-local hook/override gates do not establish universal pre-hook refusal. Core7a8 remains held and is not adopted.",
+  "python": "3.14.4",
+  "release_impact": "No model/package release, HF write, default dependency change, ownership transfer, protected checkout edit, native/GPU training or merge",
+  "return_review": {
+    "corrections": [
+      "Delete originally absent instance forward/marker attributes during cleanup instead of leaving bound-method shadows.",
+      "Restore original instance presence of inherited checkpoint attributes around shared cleanup, including observation and failures.",
+      "Reject preexisting local module/parameter hooks, instance call/serialization overrides, compiled calls and active checkpoint wrappers before model hashing/attachment.",
+      "Add normal/failure cleanup and repeated borrowed-open tests, 30 local hook/override rejection cases, and fixed historical PG82 hash tests."
+    ],
+    "reviewed_head": "94cce4fdc8aeddc0d9e1da17a0fa53d09b98ee3a",
+    "status": "PENDING mandatory Claude actual-diff RETURN review of seeded v2 cohort; no landing"
+  },
+  "schema": "glimmer-modern-cpu-validation-v1",
+  "shared_api_gap": "lifecycle.SliderSession.close and inference.InferenceSession.close mark closed before binding.close; callback failure blocks public retry. Product cleanup attempts all owned stages; shared lifecycle corrections require central owner review.",
+  "tests": {
+    "sdist-tests.log": ".....................................................................    [100%]\n69 passed in 6.72s",
+    "wheel-tests.log": ".....................................................................    [100%]\n69 passed in 7.17s"
+  },
+  "versions": {
+    "hndl": "0.10.0",
+    "hypergan": "2.0.0",
+    "meta-glimmer-modern-response": "0.1.0",
+    "numpy": "2.5.4",
+    "particle-sliders-core": "0.12.0",
+    "particlegan": "0.9.4",
+    "pytest": "9.2.0",
+    "setuptools": "84.2.1",
+    "torch": "2.15.0+cpu"
+  }
+}

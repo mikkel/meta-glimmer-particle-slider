@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=84.2.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "meta-glimmer-modern-response"
+version = "0.1.0"
+description = "Opt-in Glimmer shared response lifecycle CPU conformance cohort"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.11,<3.15"
+dependencies = [
+  "torch>=2.6,<3",
+  "particle-sliders-core[hypergan-hndl] @ git+https://github.com/HyperGAN/particle-sliders.git@4abc0eb03a4e3a84fc3e6d02734c13dc7e8ea231#subdirectory=packages/particle-sliders-core",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10", "build>=1"]
+
+[project.entry-points."particle_sliders.response_backends"]
+glimmer-modern = "glimmer_modern.lifecycle:BACKEND"
+
+[project.entry-points."particle_sliders.inference_backends"]
+glimmer-modern = "glimmer_modern.lifecycle:INFERENCE"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+glimmer_modern = ["*.hndl", "source-lock.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
